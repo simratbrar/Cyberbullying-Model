@@ -29,8 +29,12 @@ def clean_post(post):
     #remove <br> tag
     post=re.sub('<br>','',post)
     
+    #remove &quot tag
+    post=re.sub('&quot','',post)
+    
     #filter only alphanumeric characters
     post=re.sub(r'[^a-zA-Z ]+','',post)
+    
     return post
     
 def filter_token(token):
@@ -40,11 +44,11 @@ def filter_token(token):
         token=re.sub(pattern,letter+letter,token)
     return token
 
-def get_dataset(path='formspring_data.csv'):
+def get_dataset(path='Dataset/formspring_data.csv'):
     data = pd.read_csv(path, error_bad_lines=False,sep='\t',
                    names=['userid','post','ques','ans','asker','ans1','severity1','bully1','ans2',
                           'severity2','bully2','ans3','severity3','bully3'])
-    dataset=[]
+    
     for ind in range(1,len(data)):
         if(data.loc[ind,'ans1']==YES):
             dataset.append((clean_post(str(data.loc[ind,'bully1'])),YES))
@@ -59,7 +63,6 @@ def get_dataset(path='formspring_data.csv'):
 
 def tokenize_dataset(dataset):
     data_tokenized=[]
-
     for post,label in dataset:
         post=word_tokenize(post)
         post=[filter_token(token) for token in post]
@@ -105,7 +108,7 @@ def write_word_to_phoneme_dict(word_to_phoneme_dict,path='wordtophoneme.csv'):
             file.write(word+'\t'+phoneme+'\n')
         file.close()
 
-def read_word_to_phoneme(path='wordtophoneme.csv'):
+def read_word_to_phoneme(path='Dataset/wordtophoneme.csv'):
     word_phoneme_df=pd.read_csv(path,sep='\t',names=['word','phoneme'])
     word_to_phoneme_dict={}
     for index in range(len(word_phoneme_df)):
@@ -118,5 +121,7 @@ def get_tokenized_dataset():
     dataset=get_dataset()
     tokenized_dataset=tokenize_dataset(dataset)
     return tokenized_dataset
+
+
 
 
